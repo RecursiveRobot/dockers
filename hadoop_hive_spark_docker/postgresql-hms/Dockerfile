@@ -1,4 +1,4 @@
-FROM postgres
+FROM postgres@9.6.16
 
 MAINTAINER Aditya Pal <aditya.pal.science@gmail.com>
 
