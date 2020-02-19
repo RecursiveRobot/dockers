@@ -55,7 +55,7 @@ if [[ $1 = "start" ]]; then
   
   # 3 nodes
   echo ">> Starting nodes master and worker nodes ..."
-  docker run -d --net hadoopnet --ip 172.18.1.1 --hostname nodemaster --add-host node2:172.18.1.2 --add-host node3:172.18.1.3 --name nodemaster --publish 8088:8088 --publish 50070:50070 --publish 19888:19888 --publish 8080:8080 --publish 18080:18080 -it hive
+  docker run -d --net hadoopnet --ip 172.18.1.1 --hostname nodemaster --add-host node2:172.18.1.2 --add-host node3:172.18.1.3 --name nodemaster --publish 8088:8088 --publish 50070:50070 --publish 19888:19888 --publish 8080:8080 --publish 18080:18080 --publish 9083:9083 --publish 10000:10000 -it hive
   docker run -d --net hadoopnet --ip 172.18.1.2 --hostname node2 --add-host nodemaster:172.18.1.1 --add-host node3:172.18.1.3 --name node2 -it spark
   docker run -d --net hadoopnet --ip 172.18.1.3 --hostname node3 --add-host nodemaster:172.18.1.1 --add-host node2:172.18.1.2 --name node3 -it spark
 
