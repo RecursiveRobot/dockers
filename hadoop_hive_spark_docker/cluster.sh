@@ -29,6 +29,7 @@ function startServices {
   sleep 5
   echo ">> Starting Hive Metastore ..."
   docker exec -u hadoop -d nodemaster hive --service metastore
+  docker exec -u hadoop -d nodemaster hive --service hiveserver2
   echo "Hadoop info @ nodemaster: http://172.18.1.1:8088/cluster"
   echo "DFS Health @ nodemaster : http://172.18.1.1:50070/dfshealth"
   echo "MR-JobHistory Server @ nodemaster : http://172.18.1.1:19888"
@@ -50,18 +51,18 @@ if [[ $1 = "start" ]]; then
 
   # Starting Postresql Hive metastore
   echo ">> Starting postgresql hive metastore ..."
-  docker run -d --net hadoopnet --ip 172.18.1.4 --hostname psqlhms --name psqlhms -it postgresql-hms
+  docker run -d --net hadoopnet --ip 172.18.1.4 --hostname psqlhms --name psqlhms --mount type=volume,src=psqlhms,dst=/var/lib/postgresql/data -it postgresql-hms
   sleep 5
   
   # 3 nodes
   echo ">> Starting nodes master and worker nodes ..."
-  docker run -d --net hadoopnet --ip 172.18.1.1 --hostname nodemaster --add-host node2:172.18.1.2 --add-host node3:172.18.1.3 --name nodemaster --publish 8088:8088 --publish 50070:50070 --publish 19888:19888 --publish 8080:8080 --publish 18080:18080 --publish 9083:9083 --publish 10000:10000 --publish 50470:50470 --publish 8020:8020 --publish 9000:9000 --publish 50030:50030 --publish 8021:8021  -it hive
-  docker run -d --net hadoopnet --ip 172.18.1.2 --hostname node2 --add-host nodemaster:172.18.1.1 --add-host node3:172.18.1.3 --name node2 -it spark
-  docker run -d --net hadoopnet --ip 172.18.1.3 --hostname node3 --add-host nodemaster:172.18.1.1 --add-host node2:172.18.1.2 --name node3 -it spark
+  docker run -d --net hadoopnet --ip 172.18.1.1 --hostname nodemaster --add-host node2:172.18.1.2 --add-host node3:172.18.1.3 --name nodemaster --mount type=volume,src=nodemaster,dst=/home/hadoop --publish 8088:8088 --publish 50070:50070 --publish 19888:19888 --publish 8080:8080 --publish 18080:18080 --publish 9083:9083 --publish 10000:10000 --publish 50470:50470 --publish 8020:8020 --publish 9000:9000 --publish 50030:50030 --publish 8021:8021  -it hive
+  docker run -d --net hadoopnet --ip 172.18.1.2 --hostname node2 --add-host nodemaster:172.18.1.1 --add-host node3:172.18.1.3 --name node2 --mount type=volume,src=node2,dst=/home/hadoop/data -it spark
+  docker run -d --net hadoopnet --ip 172.18.1.3 --hostname node3 --add-host nodemaster:172.18.1.1 --add-host node2:172.18.1.2 --name node3 --mount type=volume,src=node3,dst=/home/hadoop/data -it spark
 
   # Format nodemaster
   echo ">> Formatting hdfs ..."
-  docker exec -u hadoop -it nodemaster hdfs namenode -format
+  #docker exec -u hadoop -it nodemaster hdfs namenode -format
   startServices
   exit
 fi

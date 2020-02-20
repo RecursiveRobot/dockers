@@ -1,10 +1,11 @@
-FROM postgres:9.6.16
+FROM postgres:9.5.18
 
 MAINTAINER Aditya Pal <aditya.pal.science@gmail.com>
 
 USER root
 
 RUN export LANGUAGE=en_US.UTF-8
+RUN export POSTGRES_HOST_AUTH_METHOD=trust
 ADD configs/hive-schema-2.3.0.postgres.sql /hive/hive-schema-2.3.0.postgres.sql
 ADD configs/hive-txn-schema-2.3.0.postgres.sql /hive/hive-txn-schema-2.3.0.postgres.sql
 
